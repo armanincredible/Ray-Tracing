@@ -6,7 +6,8 @@
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
+protected:
+    void paintEvent(QPaintEvent *);
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
