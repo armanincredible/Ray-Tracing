@@ -25,6 +25,14 @@ public:
         in_point_(in)
     {}
     Vector(){}
+    Point get_out_point() const
+    {
+        return out_point_;
+    }
+    Point get_in_point() const
+    {
+        return in_point_;
+    }
     Point get_real_in_point() const
     {
         return real_in_point_;
@@ -38,10 +46,26 @@ public:
         out_point_ = out;
         in_point_  = in;
     }
+    double get_length_x() const
+    {
+        return in_point_.x - out_point_.x;
+    }
+    double get_length_y() const
+    {
+        return in_point_.y - out_point_.y;
+    }
 
     void CalculateRealPoints(Point);
-    void CalculateTriangle(Point);
+    void CalculateArrow(Point);
     int paintVector(QPainter* painter, Point);
+
+    Vector operator + (const Vector &);
+    Vector operator - (const Vector &);
+    void operator += (const Vector &);
+    void operator -= (const Vector &);
+    double operator * (const Vector &);
+    Vector operator * (const double);
+    void operator *= (const double);
 };
 
 #endif // VECTORS_H

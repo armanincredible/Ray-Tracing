@@ -10,9 +10,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QWidget window;
     window.resize(1200, 1200);
-    Window w({100, 100}, {400, 400}, {250, 250}, clock_vector);
+    Window_Clock w({100, 100}, {400, 400}, {250, 250});
     w.set_radius(80);
-    Window w1({100, 100}, {400, 400}, {250, 250}, click_vector);
+    Window_Click w1({100, 100}, {400, 400}, {250, 250});
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(&w);

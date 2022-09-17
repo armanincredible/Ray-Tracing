@@ -7,34 +7,26 @@
 #include "QWidget"
 #include "math.h"
 
-enum type_window
-{
-    clock_vector,
-    click_vector
-};
+
 
 class Window : public QWidget
 {
     Q_OBJECT
 
 protected:
-    void paintEvent(QPaintEvent *);
-    void mousePressEvent(QMouseEvent *);
+    virtual void paintEvent(QPaintEvent *){};
 
 private:
-    Point mouse_click_ = {};
     Point start_point_ = {};
     Point end_point_ = {};
     Point origin_point_ = {};
-    type_window type_ = {};
     double radius_ = 0;
 
 public:
-    Window(Point start, Point end, Point origin, type_window type):
+    Window(Point start, Point end, Point origin):
         start_point_(start),
         end_point_(end),
-        origin_point_(origin),
-        type_(type)
+        origin_point_(origin)
     {
     }
     ~Window(){}
@@ -53,6 +45,10 @@ public:
     {
         radius_ = radius;
     }
+    double get_radius()
+    {
+        return radius_;
+    }
 
     Point get_origin_point() const
     {
@@ -63,6 +59,27 @@ public:
         return start_point_;
     }
     int paintCoordinateSystem(QPainter*);
+};
+
+class Window_Clock : public Window
+{
+protected:
+    void paintEvent(QPaintEvent *) override;
+public:
+    Window_Clock(Point start, Point end, Point origin):
+        Window(start, end, origin){};
+};
+
+class Window_Click : public Window
+{
+private:
+     Point mouse_click_ = {};
+protected:
+    void paintEvent(QPaintEvent *) override;
+    void mousePressEvent(QMouseEvent *) override;
+public:
+    Window_Click(Point start, Point end, Point origin):
+        Window(start, end, origin){};
 };
 
 

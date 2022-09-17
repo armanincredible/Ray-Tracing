@@ -24,7 +24,8 @@ int Window::paintCoordinateSystem (QPainter* painter)
     return 0;
 }
 
-void Window::paintEvent(QPaintEvent *event)
+
+void Window_Clock::paintEvent(QPaintEvent *)
 {
     static double alpha = 0;
 
@@ -33,29 +34,31 @@ void Window::paintEvent(QPaintEvent *event)
     Point origin_point = get_origin_point();
     paintCoordinateSystem(&painter);
 
-    Vector vec;
-    if (type_ == clock_vector)
-    {
-        vec = {{0, 0}, {radius_ * sin(alpha), radius_ * cos(alpha)}};
-    }
-    else
-    {
-        vec = {{0, 0}, {mouse_click_.x, mouse_click_.y}};
-    }
-
+    Vector vec = {{0, 0}, {get_radius() * sin(alpha), get_radius() * cos(alpha)}};
     vec.paintVector(&painter, origin_point);
 
-    if (type_ == clock_vector)
-    {
-        alpha += 3.14/10000;
-        update();
-    }
+    alpha += 3.14/10000;
+    update();
 }
 
-void Window::mousePressEvent(QMouseEvent *event)
+
+void Window_Click::mousePressEvent(QMouseEvent *event)
 {
     Point origin_point = get_origin_point();
     mouse_click_.x = event->x() - origin_point.x;
     mouse_click_.y = origin_point.y - event->y();
     repaint();
+}
+
+
+void Window_Click::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+
+    Point origin_point = get_origin_point();
+    paintCoordinateSystem(&painter);
+
+    Vector vec = {{0, 0}, {mouse_click_.x, mouse_click_.y}};
+
+    vec.paintVector(&painter, origin_point);
 }
