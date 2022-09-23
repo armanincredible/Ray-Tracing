@@ -1,11 +1,13 @@
 #ifndef VECTORS_H
 #define VECTORS_H
 #include "QPainter"
+#include "math.h"
 
 struct Point
 {
     double x = 0;
     double y = 0;
+    double z = 0;
 };
 
 class Vector
@@ -50,9 +52,17 @@ public:
     {
         return in_point_.x - out_point_.x;
     }
+    double get_length_z() const
+    {
+        return in_point_.z - out_point_.z;
+    }
     double get_length_y() const
     {
         return in_point_.y - out_point_.y;
+    }
+    double get_sqaure_length() const
+    {
+        return pow(get_length_x(), 2) + pow(get_length_y(), 2) + pow(get_length_z(), 2);
     }
 
     void CalculateRealPoints(Point);
@@ -61,11 +71,14 @@ public:
 
     Vector operator + (const Vector &);
     Vector operator - (const Vector &);
+    Vector operator ^ (const Vector &);
     void operator += (const Vector &);
     void operator -= (const Vector &);
     double operator * (const Vector &);
     Vector operator * (const double);
     void operator *= (const double);
 };
+
+double get_cos (Vector&, Vector&);
 
 #endif // VECTORS_H

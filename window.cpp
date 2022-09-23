@@ -35,7 +35,9 @@ void Window_Clock::paintEvent(QPaintEvent *)
     paintCoordinateSystem(&painter);
 
     Vector vec = {{0, 0}, {get_radius() * sin(alpha), get_radius() * cos(alpha)}};
+    Vector vec2 = vec - vec * 2;
     vec.paintVector(&painter, origin_point);
+    vec2.paintVector(&painter, origin_point);
 
     alpha += 3.14/10000;
     update();

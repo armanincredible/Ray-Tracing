@@ -20,7 +20,6 @@ private:
     Point start_point_ = {};
     Point end_point_ = {};
     Point origin_point_ = {};
-    double radius_ = 0;
 
 public:
     Window(Point start, Point end, Point origin):
@@ -29,6 +28,7 @@ public:
         origin_point_(origin)
     {
     }
+    Window(){}
     ~Window(){}
 
     int heigh() const
@@ -39,15 +39,6 @@ public:
     int width() const
     {
         return end_point_.x - start_point_.x;
-    }
-
-    void set_radius(double radius)
-    {
-        radius_ = radius;
-    }
-    double get_radius()
-    {
-        return radius_;
     }
 
     Point get_origin_point() const
@@ -63,11 +54,22 @@ public:
 
 class Window_Clock : public Window
 {
+private:
+    double radius_ = 0;
 protected:
     void paintEvent(QPaintEvent *) override;
 public:
     Window_Clock(Point start, Point end, Point origin):
         Window(start, end, origin){};
+
+    void set_radius(double radius)
+    {
+        radius_ = radius;
+    }
+    double get_radius()
+    {
+        return radius_;
+    }
 };
 
 class Window_Click : public Window

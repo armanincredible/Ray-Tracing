@@ -18,6 +18,8 @@ set(PROJECT_SOURCES
         main.cpp
         vectors.h
         vectors.cpp
+        sphere.h
+        sphere.cpp
         window.h
         window.cpp
 )

@@ -6,8 +6,8 @@ static const double EPS = 10e-8;
 
 void Vector::CalculateRealPoints(Point origin_point)
 {
-    real_in_point_ = {(double)(in_point_.x + origin_point.x), (double)(-in_point_.y + origin_point.y)};
-    real_out_point_ = {(double)(out_point_.x + origin_point.x), (double)(-out_point_.y + origin_point.y)};
+    real_in_point_ = {(double)(in_point_.x + origin_point.x), (double)(-in_point_.y + origin_point.y), in_point_.z};
+    real_out_point_ = {(double)(out_point_.x + origin_point.x), (double)(-out_point_.y + origin_point.y), out_point_.z};
 }
 
 void Vector::CalculateArrow(Point origin_point)
@@ -71,11 +71,11 @@ int Vector::paintVector (QPainter* painter, Point origin_point)
     return 0;
 }
 
-#define MAKE_POINTS_PLUS                                                                     \
-        Point new_in = {in_point_.x + vec.get_length_x(), in_point_.y + vec.get_length_y()};
+#define MAKE_POINTS_PLUS                                                                                                        \
+        Point new_in = {in_point_.x + vec.get_length_x(), in_point_.y + vec.get_length_y(), in_point_.z + vec.get_length_z()};
 
-#define MAKE_POINTS_MINUS                                                                    \
-        Point new_in = {in_point_.x - vec.get_length_x(), in_point_.y - vec.get_length_y()};
+#define MAKE_POINTS_MINUS                                                                                                       \
+        Point new_in = {in_point_.x - vec.get_length_x(), in_point_.y - vec.get_length_y(), in_point_.z - vec.get_length_z()};
 
 Vector Vector::operator +(const Vector &vec)
 {
@@ -88,6 +88,13 @@ Vector Vector::operator -(const Vector &vec)
 {
     MAKE_POINTS_MINUS
     return Vector(out_point_, new_in);
+}
+
+Vector Vector::operator ^(const Vector &vec)
+{
+    Point delta_first = {get_length_x(), get_length_y(), get_length_z()};
+    Point delta_second = {vec.get_length_x(), vec.get_length_y(), vec.get_length_z()};
+    return Vector({0, 0, 0}, {delta_first.x * delta_second.x, delta_first.y * delta_second.y, delta_first.z * delta_second.z});
 }
 
 void Vector::operator +=(const Vector &vec)
@@ -107,28 +114,33 @@ void Vector::operator -=(const Vector &vec)
 
 double Vector::operator *(const Vector &vec)
 {
-    Point delta_first = {get_length_x(), get_length_y()};
-    Point delta_second = {vec.in_point_.x - vec.out_point_.x, vec.in_point_.y - vec.out_point_.y};
-    return delta_first.x * delta_second.x + delta_first.y * delta_second.y;
+    Point delta_first = {get_length_x(), get_length_y(), get_length_z()};
+    Point delta_second = {vec.get_length_x(), vec.get_length_y(), vec.get_length_z()};
+    return delta_first.x * delta_second.x + delta_first.y * delta_second.y + delta_first.z * delta_second.z;
 }
 
 Vector Vector::operator *(const double num)
 {
-    Point length = {num * (get_length_x()), num * (get_length_y())};
+    Point length = {num * (get_length_x()), num * (get_length_y()), num * (get_length_z())};
 
     if (num >= 0)
     {
-        return Vector(out_point_, {out_point_.x + length.x, out_point_.y + length.y});
+        return Vector(out_point_, {out_point_.x + length.x, out_point_.y + length.y, out_point_.z + length.z});
     }
     else
     {
-        return Vector(in_point_, {in_point_.x + length.x, in_point_.y + length.y});
+        return Vector(in_point_, {in_point_.x + length.x, in_point_.y + length.y, in_point_.z + length.z});
     }
 }
 
 void Vector::operator *=(const double num)
 {
-    Point length = {num * (get_length_x()), num * (get_length_y())};
-    in_point_ = {out_point_.x + length.x, out_point_.y + length.y};
+    Point length = {num * (get_length_x()), num * (get_length_y()), num * (get_length_z())};
+    in_point_ = {out_point_.x + length.x, out_point_.y + length.y, out_point_.z + length.z};
 }
 
+
+double get_cos(Vector &vec1, Vector &vec2)
+{
+    return vec1 * vec2 / (sqrt(vec1.get_sqaure_length()) * sqrt(vec2.get_sqaure_length()));
+}
