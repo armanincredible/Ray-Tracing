@@ -18,12 +18,14 @@ private:
     double power_of_specular_ = 0;
     Point center_coordinate_ = {0, 0, 0};
     Vector color_material_ = {};
+    bool matte_ = 0;
 public:
-    Sphere(double length, double pow, Point coord, Point color):
+    Sphere(double length, double pow, Point coord, Point color, bool matte):
         power_of_specular_(pow),
         radius_(length),
         center_coordinate_(coord),
-        color_material_({0, 0, 0}, color)
+        color_material_({0, 0, 0}, color),
+        matte_(matte)
     {}
     void set_radius(double radius)
     {
@@ -52,6 +54,10 @@ public:
     Vector get_color_material()
     {
         return color_material_;
+    }
+    bool is_matte ()
+    {
+        return matte_;
     }
 };
 
@@ -114,9 +120,9 @@ public:
     {
         lamps_.push_back(Lamp(coordinate, color));
     }
-    void add_sphere (double length, double pow, Point coord, Point color)
+    void add_sphere (double length, double pow, Point coord, Point color, bool matte)
     {
-        spheres_.push_back(Sphere(length, pow, coord, color));
+        spheres_.push_back(Sphere(length, pow, coord, color, matte));
     }
 
     void set_viewer_point (Point_int p)
@@ -145,7 +151,7 @@ public:
 
     double calculate_diffuse (Point, Sphere&, Lamp&);
     double calculate_specular (Point, Sphere&, Lamp&);
-    Point get_points_crossed_sphere (Vector&);
+    int get_points_crossed_sphere (Vector&, Point&);
 };
 
 

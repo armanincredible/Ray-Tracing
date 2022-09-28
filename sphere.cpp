@@ -4,6 +4,7 @@
 #include "square_equation.h"
 #include "control.h"
 
+static const int MAX_NUM_REFLECTION = 3;
 static const double Ambient = 0.1;
 
 static int is_eq (double num1, double num2)
@@ -96,11 +97,9 @@ void Window_Sphere::paintSphere()
 void Window_Sphere::paintRacing()// // // // // // // / / // // / /// / / // / / / // / ////// ///////// // // // // / / / // / /
 {
     uchar* collor_buffer = src_.bits();
-    Lamp lamp = lamps_.front();
     Sphere sphere = spheres_.front();
     double origin_x = get_origin_point().x;
     double origin_y = get_origin_point().y;
-    Vector ray_and_material_collor = sphere.get_color_material() ^ lamp.get_collor_ray();
 
     for (int y_len = 0; y_len < size_.y; y_len++)
     {
@@ -111,40 +110,42 @@ void Window_Sphere::paintRacing()// // // // // // // / / // // / /// / / // / /
             //double z = calculate_z (sphere_.get_radius(), point_on_screen.x, point_on_screen.y);
             Vector v({(double)viewer_.x, (double)viewer_.y, (double)viewer_.z}, {point_on_screen.x, point_on_screen.y, 0});
 
-            Point point_on_sphere = get_points_crossed_sphere(v);
+            Point point_on_sphere = {};
 
-            if (point_on_sphere.x == -666)
+            if (get_points_crossed_sphere(v, point_on_sphere))
             {
                 continue;
             }
-            Vector Color = ray_and_material_collor * (calculate_diffuse(point_on_sphere, sphere, lamp) + Ambient) +
-                            lamp.get_collor_ray() * pow(calculate_specular(point_on_sphere, sphere, lamp), sphere.get_power_of_specular());
-            Point Color_point = Color.get_in_point();
 
-            clap_value(Color_point.x);
-            clap_value(Color_point.y);
-            clap_value(Color_point.z);
-            collor_buffer[y_len * size_.x * 3 + 2 + x_len * 3] = (uchar)(Color_point.z * 250);
-            collor_buffer[y_len * size_.x * 3 + 1 + x_len * 3] = (uchar)(Color_point.y * 250);
-            collor_buffer[y_len * size_.x * 3 + 0 + x_len * 3] = (uchar)(Color_point.x * 250);
+            Vector Color = {};
+            for (Lamp lamp : lamps_)
+            {
+                Vector ray_and_material_collor = sphere.get_color_material() ^ lamp.get_collor_ray();
+                Color += ray_and_material_collor * (calculate_diffuse(point_on_sphere, sphere, lamp) + Ambient) +
+                                lamp.get_collor_ray() * pow(calculate_specular(point_on_sphere, sphere, lamp), sphere.get_power_of_specular());
+                Point Color_point = Color.get_in_point();
+
+                clap_value(Color_point.x);
+                clap_value(Color_point.y);
+                clap_value(Color_point.z);
+                collor_buffer[y_len * size_.x * 3 + 2 + x_len * 3] = (uchar)(Color_point.z * 250);
+                collor_buffer[y_len * size_.x * 3 + 1 + x_len * 3] = (uchar)(Color_point.y * 250);
+                collor_buffer[y_len * size_.x * 3 + 0 + x_len * 3] = (uchar)(Color_point.x * 250);
+            }
         }
     }
 }
 
-Point Window_Sphere::get_points_crossed_sphere (Vector& v)
+int Window_Sphere::get_points_crossed_sphere (Vector& v, Point& point)
 {
     Sphere sphere = spheres_.front();
     double radius = sphere.get_radius();
     Point center_point = sphere.get_center_coordinate();
 
-    //double z = calculate_z(radius, X, Y);
-
-    //Point M {center_point.x - radius + X, center_point.y - radius + Y, center_point.yz};
     Vector a(center_point, v.get_out_point()); // AC
     Vector square = v | a;
 
     double length = sqrt(square.get_sqaure_length()) / sqrt(v.get_sqaure_length());
-    //printf ("%lf\n", length);
 
     if (length <= radius)
     {
@@ -152,12 +153,25 @@ Point Window_Sphere::get_points_crossed_sphere (Vector& v)
         double t2 = 0;
 
         solve_quadratic_equation(v.get_sqaure_length(), 2 * (v * a), a.get_sqaure_length() - square(radius), &t1, &t2);
-        //printf ("%lf < %lf\n", t1, t2);
         Vector new_v = v * t1;
-        return new_v.get_in_point();
+        point = new_v.get_in_point();
+
+        if (sphere.is_matte())
+        {
+            for (int i = 0; i < MAX_NUM_REFLECTION; i++)
+            {
+                is_cross (sphere)
+                {
+                    get_point
+                    return point
+                }
+            }
+            return smth;
+        }
+        return 0;
     }
 
-    return Point {-666, -666, -666};
+    return 1;
 }
 
 double Window_Sphere::calculate_diffuse (Point point_on_sphere, Sphere& sphere, Lamp& lamp)
