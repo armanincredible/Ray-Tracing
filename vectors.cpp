@@ -2,7 +2,8 @@
 #include "math.h"
 
 static const double RATIO = 10;
-static const double EPS = 10e-8;
+
+static const double EPS = 10e-6;
 
 void Vector::CalculateRealPoints(Point origin_point)
 {
@@ -71,6 +72,7 @@ int Vector::paintVector (QPainter* painter, Point origin_point)
     return 0;
 }
 
+//functions
 #define MAKE_POINTS_PLUS                                                                                                        \
         Point new_in = {in_point_.x + vec.get_length_x(), in_point_.y + vec.get_length_y(), in_point_.z + vec.get_length_z()};
 
@@ -97,16 +99,31 @@ Vector Vector::operator ^(const Vector &vec)
     return Vector({0, 0, 0}, {delta_first.x * delta_second.x, delta_first.y * delta_second.y, delta_first.z * delta_second.z});
 }
 
-void Vector::operator +=(const Vector &vec)
+Vector Vector::operator |(const Vector &vec)
+{
+    Point in_point     = {get_length_x(), get_length_y(), get_length_z()};
+    Point vec_in_point = {vec.get_length_x(), vec.get_length_y(), vec.get_length_z()};
+
+    Point new_out_point{0, 0, 0};
+    Point new_in_point{in_point.y * vec_in_point.z - in_point.z * vec_in_point.y,
+                       in_point.z * vec_in_point.x - in_point.x * vec_in_point.z,
+                       in_point.x * vec_in_point.y - in_point.y * vec_in_point.x};
+
+    return Vector(new_out_point, new_in_point);
+}
+
+Vector& Vector::operator +=(const Vector &vec)
 {
     MAKE_POINTS_PLUS
     in_point_ = new_in;
+    return *this;
 }
 
-void Vector::operator -=(const Vector &vec)
+Vector& Vector::operator -=(const Vector &vec)
 {
     MAKE_POINTS_MINUS
     in_point_ = new_in;
+    return *this;
 }
 
 #undef MAKE_POINTS_MINUS
@@ -133,12 +150,22 @@ Vector Vector::operator *(const double num)
     }
 }
 
-void Vector::operator *=(const double num)
+Vector Vector::operator /(const double num)
+{
+    return *this * (1 / num);
+}
+
+Vector& Vector::operator *=(const double num) // ret vec&
 {
     Point length = {num * (get_length_x()), num * (get_length_y()), num * (get_length_z())};
     in_point_ = {out_point_.x + length.x, out_point_.y + length.y, out_point_.z + length.z};
+    return *this;
 }
 
+void Vector::NormalizeVector()
+{
+    *this = *this / sqrt(get_sqaure_length());
+}
 
 double get_cos(Vector &vec1, Vector &vec2)
 {

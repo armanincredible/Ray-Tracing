@@ -17,11 +17,14 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 set(PROJECT_SOURCES
         main.cpp
         vectors.h
+        square_equation.h
+        square_equation.cpp
         vectors.cpp
         sphere.h
         sphere.cpp
         window.h
         window.cpp
+        control.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

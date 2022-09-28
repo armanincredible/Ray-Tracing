@@ -3,6 +3,10 @@
 #include "QPainter"
 #include "math.h"
 
+#define square(num) (num * num)
+
+//static const double EPS = 10e-8;
+
 struct Point
 {
     double x = 0;
@@ -62,21 +66,24 @@ public:
     }
     double get_sqaure_length() const
     {
-        return pow(get_length_x(), 2) + pow(get_length_y(), 2) + pow(get_length_z(), 2);
+        return square(get_length_x()) + square(get_length_y()) + square(get_length_z());
     }
 
     void CalculateRealPoints(Point);
     void CalculateArrow(Point);
     int paintVector(QPainter* painter, Point);
+    void NormalizeVector();
 
     Vector operator + (const Vector &);
     Vector operator - (const Vector &);
     Vector operator ^ (const Vector &);
-    void operator += (const Vector &);
-    void operator -= (const Vector &);
+    Vector operator | (const Vector &);
+    Vector& operator += (const Vector &);
+    Vector& operator -= (const Vector &);
     double operator * (const Vector &);
     Vector operator * (const double);
-    void operator *= (const double);
+    Vector operator / (const double);
+    Vector& operator *= (const double);
 };
 
 double get_cos (Vector&, Vector&);
