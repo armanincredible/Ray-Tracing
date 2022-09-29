@@ -18,14 +18,14 @@ private:
     double power_of_specular_ = 0;
     Point center_coordinate_ = {0, 0, 0};
     Vector color_material_ = {};
-    bool matte_ = 0;
+    int num_reflections_rays_ = 0;
 public:
-    Sphere(double length, double pow, Point coord, Point color, bool matte):
+    Sphere(double length, double pow, Point coord, Point color, int num_reflections):
         power_of_specular_(pow),
         radius_(length),
         center_coordinate_(coord),
         color_material_({0, 0, 0}, color),
-        matte_(matte)
+        num_reflections_rays_(num_reflections)
     {}
     void set_radius(double radius)
     {
@@ -55,9 +55,9 @@ public:
     {
         return color_material_;
     }
-    bool is_matte ()
+    int get_num_reflections_rays ()
     {
-        return matte_;
+        return num_reflections_rays_;
     }
 };
 
@@ -99,6 +99,30 @@ private:
     QImage src_ = {};
     Point_int size_ = {};
     Point_int viewer_ = {};
+    int cur_num_reflection_ = 0;
+    int max_num_reeflecions_ = 0;
+
+    Vector get_color_vector_on_screen(Vector&);
+    Vector get_color_vector_on_sphere(Sphere&, Point&);
+    void clap_color_point(Point&);
+    double calculate_diffuse (Point, Sphere&, Lamp&);
+    double calculate_specular (Point, Sphere&, Lamp&);
+    int get_points_crossed_sphere (Vector&, Point&);
+
+    void clap_value(double &value)
+    {
+        if (value > 1 || value < 0)
+        {
+            value = 1;
+        }
+    }
+    void clap_value(int &value)
+    {
+        if (value > 1 || value < 0)
+        {
+            value = 1;
+        }
+    }
 public:
     void paintSphere();
     void paintRacing();
@@ -120,9 +144,9 @@ public:
     {
         lamps_.push_back(Lamp(coordinate, color));
     }
-    void add_sphere (double length, double pow, Point coord, Point color, bool matte)
+    void add_sphere (double length, double pow, Point coord, Point color, int num_reflections)
     {
-        spheres_.push_back(Sphere(length, pow, coord, color, matte));
+        spheres_.push_back(Sphere(length, pow, coord, color, num_reflections));
     }
 
     void set_viewer_point (Point_int p)
@@ -134,24 +158,11 @@ public:
         return viewer_;
     }
 
-    void clap_value(double &value)
+    void set_max_num_reflection(int num)
     {
-        if (value > 1 || value < 0)
-        {
-            value = 1;
-        }
-    }
-    void clap_value(int &value)
-    {
-        if (value > 1 || value < 0)
-        {
-            value = 1;
-        }
+        max_num_reeflecions_ = num;
     }
 
-    double calculate_diffuse (Point, Sphere&, Lamp&);
-    double calculate_specular (Point, Sphere&, Lamp&);
-    int get_points_crossed_sphere (Vector&, Point&);
 };
 
 

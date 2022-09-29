@@ -136,6 +136,55 @@ void Window_Sphere::paintRacing()// // // // // // // / / // // / /// / / // / /
     }
 }
 
+Vector Window_Sphere::get_color_vector_on_screen(Vector& v)
+{
+    Vector color({0, 0, 0}, {0, 0, 0});
+    for (Sphere sphere : spheres_)
+    {
+        Point point_on_sphere = {};
+        if (get_points_crossed_sphere(v, point_on_sphere))
+        {
+            continue;
+        }
+
+        for (int cur_num_reflection_ray = 0; cur_num_reflection_ray < sphere.get_num_reflections_rays(); cur_num_reflection_ray++)
+        {
+            Point center = sphere.get_center_coordinate();
+            Vector normal (center, {point_on_sphere.x, point_on_sphere.y, point_on_sphere.z});
+            normal.NormalizeVector();
+
+            Vector v_by_n = normal * 2 + v;
+            color += get_color_vector_on_screen(v_by_n);
+        }
+
+        color += get_color_vector_on_sphere(sphere, point_on_sphere);
+    }
+
+    return color;
+}
+
+Vector Window_Sphere::get_color_vector_on_sphere(Sphere& sphere, Point& point_on_sphere)
+{
+    Vector color({0, 0, 0}, {0, 0, 0});
+    for (Lamp lamp : lamps_)
+    {
+        Vector ray_and_material_collor = sphere.get_color_material() ^ lamp.get_collor_ray();
+        color += ray_and_material_collor * (calculate_diffuse(point_on_sphere, sphere, lamp) + Ambient) +
+                        lamp.get_collor_ray() * pow(calculate_specular(point_on_sphere, sphere, lamp), sphere.get_power_of_specular());
+        Point Color_point = color.get_in_point();
+
+        clap_color_point (Color_point);
+    }
+    return color;
+}
+
+void Window_Sphere::clap_color_point(Point& color_point)
+{
+    clap_value(color_point.x);
+    clap_value(color_point.y);
+    clap_value(color_point.z);
+}
+
 int Window_Sphere::get_points_crossed_sphere (Vector& v, Point& point)
 {
     Sphere sphere = spheres_.front();
@@ -155,19 +204,6 @@ int Window_Sphere::get_points_crossed_sphere (Vector& v, Point& point)
         solve_quadratic_equation(v.get_sqaure_length(), 2 * (v * a), a.get_sqaure_length() - square(radius), &t1, &t2);
         Vector new_v = v * t1;
         point = new_v.get_in_point();
-
-        if (sphere.is_matte())
-        {
-            for (int i = 0; i < MAX_NUM_REFLECTION; i++)
-            {
-                is_cross (sphere)
-                {
-                    get_point
-                    return point
-                }
-            }
-            return smth;
-        }
         return 0;
     }
 
