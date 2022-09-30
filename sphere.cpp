@@ -171,10 +171,16 @@ Vector Window_Sphere::get_color_vector_on_screen(Vector& v)
 
         int save_num_reflection = cur_num_reflection_;
 
+        Point center = sphere.get_center_coordinate();
+        Vector normal (center, {point_on_sphere.x, point_on_sphere.y, point_on_sphere.z});
+        normal.NormalizeVector();
+        v.NormalizeVector();
+        Vector v_by_n = normal * 2 + v;
+
         for (int cur_num_reflection_ray = 0;
              cur_num_reflection_ray < sphere.get_num_reflections_rays();
              cur_num_reflection_ray++) //cur_num_reflection_ray num of rays of one sphere,
-                                                              //cur_num_reflection_ num of reflection
+                                       //cur_num_reflection_ num of reflection
         {
             cur_num_reflection_++;
             if (cur_num_reflection_ >= max_num_reeflecions_ + 1)
@@ -183,20 +189,10 @@ Vector Window_Sphere::get_color_vector_on_screen(Vector& v)
                 cur_num_reflection_ = save_num_reflection;
                 return color;
             }
-
-            Point center = sphere.get_center_coordinate();
-            Vector normal (center, {point_on_sphere.x, point_on_sphere.y, point_on_sphere.z});
-            normal.NormalizeVector();
-            v.NormalizeVector();
-
-            Vector v_by_n = normal * 2 + v;
-            //v_by_n.RotateOnRandomCorner();
-            color += get_color_vector_on_screen(v_by_n) / sphere.get_num_reflections_rays();
-
+            v_by_n.RotateOnRandomCorner();
+            color += get_color_vector_on_screen(v_by_n) / (1 * sphere.get_num_reflections_rays());
             cur_num_reflection_ = save_num_reflection;
         }
-        cur_num_reflection_ = save_num_reflection;
-
         color += get_color_vector_on_sphere(sphere, point_on_sphere);
         break;
     }
@@ -228,9 +224,14 @@ int Window_Sphere::get_points_crossed_sphere (Sphere& sphere, Vector& v, Point& 
     double radius = sphere.get_radius();
     Point center_point = sphere.get_center_coordinate();
 
+    Vector shit (v.get_out_point(), center_point);
+    if (shit * v <= 0)
+    {
+        return 1;
+    }
+
     Vector a(center_point, v.get_out_point()); // AC
     Vector square = v | a;
-
     double length = sqrt(square.get_sqaure_length()) / sqrt(v.get_sqaure_length());
 
     if (length <= radius)
@@ -240,7 +241,9 @@ int Window_Sphere::get_points_crossed_sphere (Sphere& sphere, Vector& v, Point& 
 
         solve_quadratic_equation(v.get_sqaure_length(), 2 * (v * a), a.get_sqaure_length() - square(radius), &t1, &t2);
         Vector new_v = v * t1;
+
         point = new_v.get_in_point();
+
         return 0;
     }
 

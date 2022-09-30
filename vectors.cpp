@@ -182,8 +182,8 @@ void Vector::Rotate(double a, double b)
 
 void Vector::RotateOnRandomCorner()
 {
-    double alpha = (M_PI / 50000) * (rand() % 1000);
-    double beta = (M_PI / 50000) * (rand() % 1000);
+    double alpha = (M_PI / 100000) * (rand() % 1000);
+    double beta = (M_PI / 100000) * (rand() % 1000);
     Rotate(alpha, beta);
 }
 
