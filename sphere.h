@@ -107,7 +107,7 @@ private:
     void clap_color_point(Point&);
     double calculate_diffuse (Point, Sphere&, Lamp&);
     double calculate_specular (Point, Sphere&, Lamp&);
-    int get_points_crossed_sphere (Vector&, Point&);
+    int get_points_crossed_sphere (Sphere&, Vector&, Point&);
 
     void clap_value(double &value)
     {
@@ -126,6 +126,7 @@ private:
 public:
     void paintSphere();
     void paintRacing();
+    void paintCircle(Sphere&);
     Window_Sphere(double size_x, double size_y):
         Window({0, 0}, {size_x, size_y}, {size_x/2, size_y/2}),
         src_(QImage(QSize(size_x, size_y), QImage::Format_RGB888))

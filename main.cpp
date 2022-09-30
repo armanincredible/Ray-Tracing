@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 #ifdef ONLY_SPHERE
 
     Window_Sphere w(1920, 1080);
-    w.add_sphere(300, 20, {0, 0, 0}, {0.6, 0.2, 0.45});
+    w.add_sphere(300, 20, {0, 0, 0}, {0.6, 0.2, 0.45}, 1);
     w.add_lamp({400, 200, 500}, {0.9, 0.7, 0.3});
     //w.set_lamp_point({400, 200, 500});
     w.set_viewer_point({400, 200, 500});
@@ -47,8 +47,12 @@ int main(int argc, char *argv[])
 
     w.add_lamp({300, -100, 200}, {0.5, 0.2, 0.4});
     w.add_lamp({1400, 100, 200}, {0.2, 0.3, 0.9});
-    w.add_sphere(300, 20, {1920/2, 0, 400}, {0.5, 0.2, 0.85}, false);
-    w.set_viewer_point({1920/2, 110, -1000});
+    //w.add_lamp({1920/2, 1080/2, 200}, {0.2, 0.9, 0.1});
+    //w.add_sphere(300, 20, {500, -300, 400}, {0.5, 0.2, 0.85}, false);
+    w.add_sphere(300, 20, {1920/2, 0, 400}, {0.5, 0.2, 0.85}, 1);
+    w.add_sphere(300, 20, {1760, 400, 400}, {0.5, 0.2, 0.85}, 1);
+    w.set_max_num_reflection(4);
+    w.set_viewer_point({1920/2, 100, -1000});
     w.resize(1920, 1080);
     w.show();
 

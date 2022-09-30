@@ -167,6 +167,26 @@ void Vector::NormalizeVector()
     *this = *this / sqrt(get_sqaure_length());
 }
 
+void Vector::Rotate(double a, double b)
+{
+    double x = get_length_x();
+    double y = get_length_y();
+    double z = get_length_z();
+
+    double new_x = x * cos(a) + y * sin(a) * cos(b) + z * sin(a) * sin(b);
+    double new_y = - x * sin(a) + y * cos(a) * cos(b) + z * cos(a) * sin(b);
+    double new_z = - y * sin(b) + z * cos(b);
+
+    change_points(out_point_, {out_point_.x + new_x, out_point_.y + new_y, out_point_.z + new_z});
+}
+
+void Vector::RotateOnRandomCorner()
+{
+    double alpha = (M_PI / 50000) * (rand() % 1000);
+    double beta = (M_PI / 50000) * (rand() % 1000);
+    Rotate(alpha, beta);
+}
+
 double get_cos(Vector &vec1, Vector &vec2)
 {
     return vec1 * vec2 / (sqrt(vec1.get_sqaure_length()) * sqrt(vec2.get_sqaure_length()));

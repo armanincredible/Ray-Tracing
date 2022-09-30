@@ -73,6 +73,8 @@ public:
     void CalculateArrow(Point);
     int paintVector(QPainter* painter, Point);
     void NormalizeVector();
+    void Rotate(double, double);
+    void RotateOnRandomCorner();
 
     Vector operator + (const Vector &);
     Vector operator - (const Vector &);
