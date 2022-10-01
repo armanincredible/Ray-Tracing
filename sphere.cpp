@@ -143,11 +143,13 @@ void Window_Sphere::paintRacing()// // // // // // // / / // // / /// / / // / /
 
             Vector Color = get_color_vector_on_screen (v);
             Point Color_point = Color.get_in_point();
+
             clap_color_point(Color_point);
 
             collor_buffer[y_len * size_.x * 3 + 2 + x_len * 3] = (uchar)(Color_point.z * 250);
             collor_buffer[y_len * size_.x * 3 + 1 + x_len * 3] = (uchar)(Color_point.y * 250);
             collor_buffer[y_len * size_.x * 3 + 0 + x_len * 3] = (uchar)(Color_point.x * 250);
+
         }
     }
     for (Lamp lamp : lamps_)
@@ -157,9 +159,11 @@ void Window_Sphere::paintRacing()// // // // // // // / / // // / /// / / // / /
     }
 }
 
-Vector Window_Sphere::get_color_vector_on_screen(Vector& v)
+inline Vector Window_Sphere::get_color_vector_on_screen(Vector& v)
 {
     Vector color({0, 0, 0}, {0, 0, 0});
+
+    bool crossed_sphere = false;
 
     for (Sphere sphere : spheres_)
     {
@@ -169,6 +173,7 @@ Vector Window_Sphere::get_color_vector_on_screen(Vector& v)
             continue;
         }
 
+        crossed_sphere = true;
         int save_num_reflection = cur_num_reflection_;
 
         Point center = sphere.get_center_coordinate();
@@ -189,25 +194,82 @@ Vector Window_Sphere::get_color_vector_on_screen(Vector& v)
                 cur_num_reflection_ = save_num_reflection;
                 return color;
             }
-            v_by_n.RotateOnRandomCorner();
-            color += get_color_vector_on_screen(v_by_n) / (1 * sphere.get_num_reflections_rays());
+            //v_by_n.RotateOnRandomCorner();
+            color += get_color_vector_on_screen(v_by_n) / (4 * sphere.get_num_reflections_rays());
             cur_num_reflection_ = save_num_reflection;
         }
         color += get_color_vector_on_sphere(sphere, point_on_sphere);
         break;
     }
 
+#ifdef SHADOW
+
+    if (crossed_sphere == false)
+    {
+        color += get_color_vector_env(v);
+    }
+#endif
+
     return color;
 }
 
-Vector Window_Sphere::get_color_vector_on_sphere(Sphere& sphere, Point& point_on_sphere)
+inline Vector Window_Sphere::get_color_vector_env(Vector &v)
+{
+    Vector color = {};
+    Vector normal_plane ({0, 0, 0}, {0, 1, 0});
+
+    if (normal_plane * v < 0)
+    {
+        color.change_points({0, 0, 0}, {0, 0.3, 0});
+
+        Point v2 = v.get_in_point();
+        Point v1 = v.get_out_point();
+
+        double x = 0;
+        double z = 0;
+        double koef = 0;
+        if (v1.y != v2.y)
+        {
+            koef = v1.y / (v1.y - v2.y);
+        }
+        x = koef * (v2.x - v1.x) + v1.x;
+        z = koef * (v2.z - v1.z) + v1.z;
+
+        Point cross_plane_by_n {x, 0, z};
+
+        for (Lamp lamp : lamps_)
+        {
+            Point lamp_point = lamp.get_lamp_point();
+            Vector to_place (cross_plane_by_n, lamp_point);
+            for (Sphere sphere: spheres_)
+            {
+                Point center = sphere.get_center_coordinate();
+
+                Point point_on_sphere = {};
+                if (!get_points_crossed_sphere(sphere, to_place, point_on_sphere))
+                {
+                    color *= 1 / 1.2;
+                    //color.change_points({0, 0, 0}, {0.5, 0, 0});
+                }
+            }
+        }
+    }
+    else
+    {
+        color.change_points({0, 0, 0}, {0, 0, 0.1});
+    }
+
+    return color;
+}
+
+inline Vector Window_Sphere::get_color_vector_on_sphere(Sphere& sphere, Point& point_on_sphere)
 {
     Vector color({0, 0, 0}, {0, 0, 0});
     for (Lamp lamp : lamps_)
     {
         Vector ray_and_material_collor = sphere.get_color_material() ^ lamp.get_collor_ray();
         color += ray_and_material_collor * (calculate_diffuse(point_on_sphere, sphere, lamp) + Ambient) +
-                        lamp.get_collor_ray() * pow(calculate_specular(point_on_sphere, sphere, lamp), sphere.get_power_of_specular());
+                 lamp.get_collor_ray() * pow(calculate_specular(point_on_sphere, sphere, lamp), sphere.get_power_of_specular());
     }
     return color;
 }
@@ -219,7 +281,7 @@ void Window_Sphere::clap_color_point(Point& color_point)
     clap_value(color_point.z);
 }
 
-int Window_Sphere::get_points_crossed_sphere (Sphere& sphere, Vector& v, Point& point)
+inline int Window_Sphere::get_points_crossed_sphere (Sphere& sphere, Vector& v, Point& point)
 {
     double radius = sphere.get_radius();
     Point center_point = sphere.get_center_coordinate();

@@ -98,7 +98,7 @@ private:
     std::list<Lamp> lamps_ = {};
     QImage src_ = {};
     Point_int size_ = {};
-    Point_int viewer_ = {};
+    Point viewer_ = {};
     int cur_num_reflection_ = 0;
     int max_num_reeflecions_ = 0;
 
@@ -108,6 +108,7 @@ private:
     double calculate_diffuse (Point, Sphere&, Lamp&);
     double calculate_specular (Point, Sphere&, Lamp&);
     int get_points_crossed_sphere (Sphere&, Vector&, Point&);
+    Vector get_color_vector_env(Vector&);
 
     void clap_value(double &value)
     {
@@ -150,11 +151,11 @@ public:
         spheres_.push_back(Sphere(length, pow, coord, color, num_reflections));
     }
 
-    void set_viewer_point (Point_int p)
+    void set_viewer_point (Point p)
     {
         viewer_ = p;
     }
-    Point_int get_viewer_point () const
+    Point get_viewer_point () const
     {
         return viewer_;
     }
